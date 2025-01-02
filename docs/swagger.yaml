@@ -1,0 +1,423 @@
+basePath: /
+definitions:
+  controllers.Response:
+    properties:
+      message:
+        type: string
+      pageInfo: {}
+      results: {}
+      success:
+        type: boolean
+    type: object
+  models.Movie:
+    properties:
+      castName:
+        type: string
+      directorName:
+        type: string
+      duration:
+        description: ReleaseDate time.Time `json:"releaseDate" form:"release_date"`
+        type: string
+      genreName:
+        type: string
+      id:
+        type: integer
+      synopsis:
+        type: string
+      tag:
+        description: |-
+          Image *multipart.FileHeader `json:"image" form:"image" binding:"required"`
+          Banner *multipart.FileHeader `json:"banner" form:"banner" binding:"required"`
+        type: string
+      title:
+        type: string
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+      phoneNumber:
+        type: string
+      point:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mengautentikasi user
+      parameters:
+      - description: ' '
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: Login user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk membuat user baru
+      parameters:
+      - description: ' '
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: Register user
+      tags:
+      - Auth
+  /movies:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan list semua movie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.Movie'
+                  type: array
+              type: object
+      summary: get all list movies
+      tags:
+      - Movies
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk membuat movie baru
+      parameters:
+      - description: ' '
+        in: formData
+        name: title
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: image
+        required: true
+        type: file
+      - description: ' '
+        in: formData
+        name: banner
+        required: true
+        type: file
+      - description: ' '
+        in: formData
+        name: tag
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: release_date
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: duration
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: synopsis
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.Movie'
+              type: object
+      summary: create movie
+      tags:
+      - Movies
+  /movies/{id}:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan list dari id
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.Movie'
+              type: object
+      summary: get list movie by id
+      tags:
+      - Movies
+  /profiles:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.User'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: get profile by id
+      tags:
+      - Profiles
+  /users:
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan list semua user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: get all list users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk membuat user baru
+      parameters:
+      - description: ' '
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: create user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk menghapus user
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: delete user by id
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan user
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.User'
+              type: object
+      summary: get users by id
+      tags:
+      - Users
+    patch:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk merubah data user
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: ' '
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: first_name
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: last_name
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: phone_number
+        required: true
+        type: string
+      - description: ' '
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/models.User'
+                  type: array
+              type: object
+      summary: update user
+      tags:
+      - Users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
