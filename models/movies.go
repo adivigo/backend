@@ -88,7 +88,7 @@ func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []Movi
 		fmt.Println(err)
 	}
 
-	return movies
+	return movies 
 }
 
 func FindOneMovie(paramId int) MovieData {
