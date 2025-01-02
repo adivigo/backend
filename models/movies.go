@@ -44,7 +44,7 @@ type MovieData struct {
 type ListMovies []Movie
 
 func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []MovieData {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	var rows pgx.Rows
@@ -88,13 +88,13 @@ func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []Movi
 		fmt.Println(err)
 	}
 
-	return movies 
+	return movies
 }
 
-func FindOneMovie(paramId int) MovieData{
+func FindOneMovie(paramId int) MovieData {
 	var movie MovieData
 
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	err := conn.QueryRow(context.Background(), `
@@ -142,12 +142,12 @@ func FindOneMovie(paramId int) MovieData{
 // }
 
 func InsertMovie(movie MovieBody, releaseDate time.Time) MovieData {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 	
 	var newlyCreated MovieData
 
-	err :=conn.QueryRow(context.Background(), `
+	conn.QueryRow(context.Background(), `
 		INSERT INTO "movies" (title, image, banner, tag, release_date, duration, synopsis) VALUES
 		($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id, title, image, banner, tag, release_date, duration, synopsis, created_at, updated_at
@@ -163,7 +163,7 @@ func InsertMovie(movie MovieBody, releaseDate time.Time) MovieData {
 		&newlyCreated.CreatedAt, 
 		&newlyCreated.UpdatedAt,
 	)
-	fmt.Println(err)
+
 	return newlyCreated
 }
 
@@ -186,8 +186,8 @@ func InsertMovie(movie MovieBody, releaseDate time.Time) MovieData {
 // 	return updatedMovie
 // }
 
-func RemoveMovie(id int) MovieData {
-	conn := lib.DB()
+func RemoveMovie(id int) (MovieData) {
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	deletedMovie := MovieData{}
@@ -213,7 +213,7 @@ func RemoveMovie(id int) MovieData {
 }
 
 func CountMovies(search string) int {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	var total int

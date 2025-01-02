@@ -30,7 +30,7 @@ type Token struct {
 type ListUsers []User
 
 func FindAllUsers(search, sortBy, sortOrder string, page, pageLimit int) ListUsers {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	var rows pgx.Rows
@@ -64,16 +64,17 @@ func FindAllUsers(search, sortBy, sortOrder string, page, pageLimit int) ListUse
 		fmt.Println(err)
 	}
 
-	return users 
+	return users
 }
 
-func FindOneUser(paramId int) User{
+func FindOneUser(paramId int) User {
 	var user User
 
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
-	err := conn.QueryRow(context.Background(), `
+
+	conn.QueryRow(context.Background(), `
 		SELECT id, email, password, first_name, last_name, phone_number, image, created_at, updated_at
 		FROM users WHERE id = $1
 	`, paramId).Scan(
@@ -86,16 +87,13 @@ func FindOneUser(paramId int) User{
 		&user.Image, 
 		&user.CreatedAt, 
 		&user.UpdatedAt)
-	if err != nil {
-		fmt.Println(err)
-	}
 	return user
 }
 
 func FindOneUserByMail(email string) User {
 	var user User
 
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	conn.QueryRow(context.Background(), `
@@ -107,7 +105,7 @@ func FindOneUserByMail(email string) User {
 }
 
 func InsertUser(user User) User {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 	
 	var newlyCreated User
@@ -133,7 +131,7 @@ func InsertUser(user User) User {
 }
 
 func UpdateUser(user User) User {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 	
 	var updatedUser User
@@ -155,8 +153,8 @@ func UpdateUser(user User) User {
 	return updatedUser
 }
 
-func DeleteUser(id int) User {
-	conn := lib.DB()
+func DeleteUser(id int) User{
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	deletedUser := User{}
@@ -176,7 +174,7 @@ func DeleteUser(id int) User {
 }
 
 func CountUsers(search string) int {
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	var total int

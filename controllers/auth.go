@@ -40,7 +40,7 @@ func Register(c *gin.Context) {
 		user.Password, _ = argon2.CreateHash(user.Password, "", argon2.DefaultParams)
 	}
 
-	newUser  := models.InsertUser (user)
+	newUser  := models.InsertUser(user)
     if newUser.Id == 0 {
         c.JSON(http.StatusInternalServerError, Response{
             Success: false,

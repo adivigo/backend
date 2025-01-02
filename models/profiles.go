@@ -21,7 +21,7 @@ type Profile struct {
 func FindOneProfile(paramId int) Profile {
 	var profile Profile
 
-	conn := lib.DB()
+	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
 	err := conn.QueryRow(context.Background(), `
