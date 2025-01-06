@@ -14,6 +14,7 @@ import (
 // @Accept x-www-form-urlencoded
 // @Produce json
 // @Success 200 {object} Response{results=models.User}
+// @Failure 401 {object} Response401
 // @Security ApiKeyAuth
 // @Router /profiles [get]
 func GetProfileById(ctx *gin.Context) {

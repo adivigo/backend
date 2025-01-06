@@ -8,7 +8,7 @@ import (
 
 // @title TixIT
 // @version 1.0
-// @description this is sample server
+// @description backend TixIT
 
 // @BasePath /
 
@@ -21,7 +21,7 @@ func main() {
 		e.RedirectTrailingSlash = false
 	})
 
-	route.MaxMultipartMemory = 8 << 20
+	route.MaxMultipartMemory = 2 << 20
 
 	routers.Routers(route)
 

@@ -20,7 +20,14 @@ import (
 // @Tags Users
 // @Accept x-www-form-urlencoded
 // @Produce json
+// @Param search query string false " "
+// @Param sortBy query string false " "
+// @Param sortOrder query string false " "
+// @Param page query string false " "
+// @Param limit query string false " "
 // @Success 200 {object} Response{results=models.ListUsers}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /users [get]
 func GetAllUsers(c *gin.Context) {
 	search := c.Query("search")
@@ -67,6 +74,8 @@ func GetAllUsers(c *gin.Context) {
 // @Produce json
 // @Param id path int true "User id"
 // @Success 200 {object} Response{results=models.User}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /users/{id} [get]
 func GetUserById(ctx *gin.Context) {
 	paramId, err := strconv.Atoi(ctx.Param("id")) 
@@ -102,8 +111,10 @@ func GetUserById(ctx *gin.Context) {
 // @Tags Users
 // @Accept x-www-form-urlencoded
 // @Produce json
-// @Param id query int true "user id"
+// @Param id path int true "user id"
 // @Success 200 {object} Response{results=models.ListUsers}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /users/{id} [DELETE]
 func DeleteUser(c *gin.Context){
 	paramId, _ := strconv.Atoi(c.Param("id")) 
@@ -132,14 +143,16 @@ func DeleteUser(c *gin.Context){
 // @Tags Users
 // @Accept x-www-form-urlencoded
 // @Produce json
-// @Param id query int true "user id"
+// @Param id path int true "user id"
 // @Param email formData string true " "
 // @Param password formData string true " "
-// @Param first_name formData string true " "
-// @Param last_name formData string true " "
-// @Param phone_number formData string true " "
+// @Param firstName formData string true " "
+// @Param lastName formData string true " "
+// @Param phoneNumber formData string true " "
 // @Param image formData file true " "
 // @Success 200 {object} Response{results=models.ListUsers}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /users/{id} [PATCH]
 func EditUser(c *gin.Context) {
 	paramId, _ := strconv.Atoi(c.Param("id")) 
@@ -208,6 +221,8 @@ func EditUser(c *gin.Context) {
 // @Param email formData string true " "
 // @Param password formData string true " "
 // @Success 200 {object} Response{results=models.ListUsers}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /users [POST]
 func CreateUser(c *gin.Context) {
 	var user models.User

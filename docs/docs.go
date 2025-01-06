@@ -136,6 +136,38 @@ const docTemplate = `{
                     "Movies"
                 ],
                 "summary": "get all list movies",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "sortOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -150,17 +182,28 @@ const docTemplate = `{
                                         "results": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/models.Movie"
+                                                "$ref": "#/definitions/models.MovieData"
                                             }
                                         }
                                     }
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk membuat movie baru",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -204,7 +247,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": " ",
-                        "name": "release_date",
+                        "name": "releaseDate",
                         "in": "formData",
                         "required": true
                     },
@@ -241,13 +284,19 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             }
         },
         "/movies/{id}": {
             "get": {
-                "description": "untuk mendapatkan list dari id",
+                "description": "untuk mendapatkan list movie dari id",
                 "consumes": [
                     "application/x-www-form-urlencoded"
                 ],
@@ -261,7 +310,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "user id",
+                        "description": "movie id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -284,6 +333,141 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "untuk menghapus movie",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Movies"
+                ],
+                "summary": "delete movie by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "movie id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "$ref": "#/definitions/models.Movie"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "untuk memesan tiket",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "place order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": " ",
+                        "name": "cinemaId",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": " ",
+                        "name": "movieId",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": " ",
+                        "name": "paymentId",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "description": " ",
+                        "name": "seats[]",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controllers.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "results": {
+                                            "$ref": "#/definitions/models.TransactionResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
                         }
                     }
                 }
@@ -325,12 +509,23 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             }
         },
         "/users": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk mendapatkan list semua user",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -342,6 +537,38 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "get all list users",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "sortBy",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "sortOrder",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": " ",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -363,10 +590,21 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk membuat user baru",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -415,12 +653,23 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             }
         },
         "/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk mendapatkan user",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -459,10 +708,21 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk menghapus user",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -479,7 +739,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "user id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     }
                 ],
@@ -504,10 +764,21 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "untuk merubah data user",
                 "consumes": [
                     "application/x-www-form-urlencoded"
@@ -524,7 +795,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "user id",
                         "name": "id",
-                        "in": "query",
+                        "in": "path",
                         "required": true
                     },
                     {
@@ -544,21 +815,21 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": " ",
-                        "name": "first_name",
+                        "name": "firstName",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": " ",
-                        "name": "last_name",
+                        "name": "lastName",
                         "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": " ",
-                        "name": "phone_number",
+                        "name": "phoneNumber",
                         "in": "formData",
                         "required": true
                     },
@@ -591,6 +862,12 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.Response401"
+                        }
                     }
                 }
             }
@@ -607,6 +884,19 @@ const docTemplate = `{
                 "results": {},
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "controllers.Response401": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "default": "Unauthorized"
+                },
+                "success": {
+                    "type": "boolean",
+                    "default": false
                 }
             }
         },
@@ -637,6 +927,73 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MovieData": {
+            "type": "object",
+            "required": [
+                "banner",
+                "image"
+            ],
+            "properties": {
+                "banner": {
+                    "type": "string"
+                },
+                "castName": {
+                    "type": "string"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "directorName": {
+                    "type": "string"
+                },
+                "duration": {
+                    "description": "ReleaseDate time.Time ` + "`" + `json:\"releaseDate\" form:\"release_date\"` + "`" + `",
+                    "type": "string"
+                },
+                "genreName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "releaseDate": {
+                    "type": "string"
+                },
+                "synopsis": {
+                    "type": "string"
+                },
+                "tag": {
+                    "description": "Image *multipart.FileHeader ` + "`" + `json:\"image\" form:\"image\" binding:\"required\"` + "`" + `\nBanner *multipart.FileHeader ` + "`" + `json:\"banner\" form:\"banner\" binding:\"required\"` + "`" + `",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TransactionResponse": {
+            "type": "object",
+            "properties": {
+                "expiryDate": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "totalPrice": {
+                    "type": "integer"
+                },
+                "virtualId": {
                     "type": "string"
                 }
             }
@@ -691,12 +1048,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "TixIT",
+	Description:      "backend TixIT",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

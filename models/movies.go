@@ -15,9 +15,9 @@ type Movie struct {
 	// Image *multipart.FileHeader `json:"image" form:"image" binding:"required"`
 	// Banner *multipart.FileHeader `json:"banner" form:"banner" binding:"required"`
 	Tag string `json:"tag" form:"tag"`
-	GenreName string `json:"genreName" form:"genre_name"`
-	DirectorName string `json:"directorName" form:"director_name"`
-	CastName string `json:"castName" form:"cast_name"`
+	GenreName *string `json:"genreName" form:"genre_name"`
+	DirectorName *string `json:"directorName" form:"director_name"`
+	CastName *string `json:"castName" form:"cast_name"`
 	// ReleaseDate time.Time `json:"releaseDate" form:"release_date"`
 	Duration string `json:"duration" form:"duration"`
 	Synopsis string `json:"synopsis" form:"synopsis"`
@@ -41,9 +41,9 @@ type MovieData struct {
 	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
 }
 
-type ListMovies []Movie
+type ListMovies []MovieData
 
-func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []MovieData {
+func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) ListMovies {
 	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 
@@ -67,7 +67,7 @@ func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []Movi
 		`, "%"+search+"%", pageLimit, offset)
 	} else {
 		rows, err = conn.Query(context.Background(), `
-			select movies.id, title, image, banner, tag,  genres.genre_name, directors.director_name, casts.cast_name, release_date, duration, synopsis, movies.created_at, movies.updated_at from movies
+			select movies.id, title, image, banner, tag, genres.genre_name, directors.director_name, casts.cast_name, release_date, duration, synopsis, movies.created_at, movies.updated_at from movies
 			left join movie_genres ON movies.id = movie_genres.movie_id
 			left join genres on movie_genres.genre_id = genres.id
 			left join movie_directors on movies.id = movie_directors.movie_id
@@ -88,7 +88,7 @@ func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) []Movi
 		fmt.Println(err)
 	}
 
-	return movies 
+	return movies
 }
 
 func FindOneMovie(paramId int) MovieData {

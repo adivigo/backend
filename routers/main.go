@@ -15,4 +15,5 @@ func Routers(router *gin.Engine) {
 	AuthRouter(router.Group("/auth"))
 	UserRouter(router.Group("/users"))
 	ProfileRouter(router.Group("/profiles"))
+	OrderRouter(router.Group("/orders"))
 }

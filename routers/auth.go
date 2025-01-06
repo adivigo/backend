@@ -8,7 +8,6 @@ import (
 )
 
 func AuthRouter(router *gin.RouterGroup) {
-	router.Use(middlewares.CheckInput())
-	router.POST("/register", controllers.Register)
-	router.POST("/login", controllers.Login)
+	router.POST("/register", middlewares.CheckInputRegister(), controllers.Register)
+	router.POST("/login", middlewares.CheckInputLogin(), controllers.Login)
 }

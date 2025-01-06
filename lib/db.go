@@ -9,6 +9,7 @@ import (
 
 func DB() (*pgx.Conn, error) {
 	godotenv.Load()
+	
 	config, err := pgx.ParseConfig("")
 	if err != nil {
 		return nil, err

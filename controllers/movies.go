@@ -31,7 +31,12 @@ type Response struct {
 	Results any `json:"results,omitempty"`
 }
 
-var MaxFileSize int64 = 8 << 20
+type Response401 struct {
+    Success bool `json:"success" default:"False"`
+    Message string `json:"message" default:"Unauthorized"`
+}
+
+var MaxFileSize int64 = 2 << 20
 
 // Tickitz
 // @Summary get all list movies
@@ -40,7 +45,13 @@ var MaxFileSize int64 = 8 << 20
 // @Tags Movies
 // @Accept x-www-form-urlencoded
 // @Produce json
+// @Param search query string false " "
+// @Param sortBy query string false " "
+// @Param sortOrder query string false " "
+// @Param page query string false " "
+// @Param limit query string false " "
 // @Success 200 {object} Response{results=models.ListMovies}
+// @Failure 401 {object} Response401
 // @Router /movies [get]
 func GetAllMovies(c *gin.Context){
 	search := c.Query("search")
@@ -102,12 +113,13 @@ func GetAllMovies(c *gin.Context){
 // Tickitz
 // @Summary get list movie by id
 // @Schemes
-// @Description untuk mendapatkan list dari id
+// @Description untuk mendapatkan list movie dari id
 // @Tags Movies
 // @Accept x-www-form-urlencoded
 // @Produce json
-// @Param id path int true "user id"
+// @Param id path int true "movie id"
 // @Success 200 {object} Response{results=models.Movie}
+// @Failure 401 {object} Response401
 // @Router /movies/{id} [get]
 func GetMovieById(ctx *gin.Context) {
 	paramId, err := strconv.Atoi(ctx.Param("id")) 
@@ -147,10 +159,12 @@ func GetMovieById(ctx *gin.Context) {
 // @Param image formData file true " "
 // @Param banner formData file true " "
 // @Param tag formData string true " "
-// @Param release_date formData string true " "
+// @Param releaseDate formData string true " "
 // @Param duration formData string true " "
 // @Param synopsis formData string true " "
 // @Success 200 {object} Response{results=models.Movie}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
 // @Router /movies [POST]
 func CreateMovie(c *gin.Context) {
 	var form models.MovieBody
@@ -165,14 +179,6 @@ func CreateMovie(c *gin.Context) {
 	}
 
 	releaseDateStr := c.PostForm("release_date")
-	if releaseDateStr == "" {
-		c.JSON(http.StatusBadRequest, Response{
-			Success: false,
-			Message: "Release date is required",
-		})
-		return
-	}
-
 	releaseDate, err := time.Parse(time.DateOnly, releaseDateStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, Response{
@@ -218,7 +224,7 @@ func handleFileUpload(c *gin.Context, fieldName string) (string, error) {
 	}
 
 	if file.Size > MaxFileSize {
-		return "", fmt.Errorf("file tidak boleh lebih dari 8MB")
+		return "", fmt.Errorf("file tidak boleh lebih dari 2MB")
 	}
 
 	splittedFilename := strings.Split(file.Filename, ".")
@@ -236,6 +242,18 @@ func handleFileUpload(c *gin.Context, fieldName string) (string, error) {
 	return storedFile, nil
 }
 
+// Tickitz
+// @Summary delete movie by id
+// @Schemes
+// @Description untuk menghapus movie
+// @Tags Movies
+// @Accept x-www-form-urlencoded
+// @Produce json
+// @Param id path int true "movie id"
+// @Success 200 {object} Response{results=models.Movie}
+// @Failure 401 {object} Response401
+// @Security ApiKeyAuth
+// @Router /movies/{id} [DELETE]
 func DeleteMovie(c *gin.Context) {
 	paramId, _ := strconv.Atoi(c.Param("id")) 
 	movie := models.FindOneMovie(paramId)

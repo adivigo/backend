@@ -9,6 +9,15 @@ definitions:
       success:
         type: boolean
     type: object
+  controllers.Response401:
+    properties:
+      message:
+        default: Unauthorized
+        type: string
+      success:
+        default: false
+        type: boolean
+    type: object
   models.Movie:
     properties:
       castName:
@@ -30,6 +39,53 @@ definitions:
           Banner *multipart.FileHeader `json:"banner" form:"banner" binding:"required"`
         type: string
       title:
+        type: string
+    type: object
+  models.MovieData:
+    properties:
+      banner:
+        type: string
+      castName:
+        type: string
+      createdAt:
+        type: string
+      directorName:
+        type: string
+      duration:
+        description: ReleaseDate time.Time `json:"releaseDate" form:"release_date"`
+        type: string
+      genreName:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      releaseDate:
+        type: string
+      synopsis:
+        type: string
+      tag:
+        description: |-
+          Image *multipart.FileHeader `json:"image" form:"image" binding:"required"`
+          Banner *multipart.FileHeader `json:"banner" form:"banner" binding:"required"`
+        type: string
+      title:
+        type: string
+      updatedAt:
+        type: string
+    required:
+    - banner
+    - image
+    type: object
+  models.TransactionResponse:
+    properties:
+      expiryDate:
+        type: string
+      status:
+        type: string
+      totalPrice:
+        type: integer
+      virtualId:
         type: string
     type: object
   models.User:
@@ -59,6 +115,9 @@ definitions:
     type: object
 info:
   contact: {}
+  description: backend TixIT
+  title: TixIT
+  version: "1.0"
 paths:
   /auth/login:
     post:
@@ -131,6 +190,27 @@ paths:
       consumes:
       - application/x-www-form-urlencoded
       description: untuk mendapatkan list semua movie
+      parameters:
+      - description: ' '
+        in: query
+        name: search
+        type: string
+      - description: ' '
+        in: query
+        name: sortBy
+        type: string
+      - description: ' '
+        in: query
+        name: sortOrder
+        type: string
+      - description: ' '
+        in: query
+        name: page
+        type: string
+      - description: ' '
+        in: query
+        name: limit
+        type: string
       produces:
       - application/json
       responses:
@@ -142,9 +222,13 @@ paths:
             - properties:
                 results:
                   items:
-                    $ref: '#/definitions/models.Movie'
+                    $ref: '#/definitions/models.MovieData'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
       summary: get all list movies
       tags:
       - Movies
@@ -175,7 +259,7 @@ paths:
         type: string
       - description: ' '
         in: formData
-        name: release_date
+        name: releaseDate
         required: true
         type: string
       - description: ' '
@@ -200,16 +284,22 @@ paths:
                 results:
                   $ref: '#/definitions/models.Movie'
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: create movie
       tags:
       - Movies
   /movies/{id}:
-    get:
+    delete:
       consumes:
       - application/x-www-form-urlencoded
-      description: untuk mendapatkan list dari id
+      description: untuk menghapus movie
       parameters:
-      - description: user id
+      - description: movie id
         in: path
         name: id
         required: true
@@ -226,9 +316,90 @@ paths:
                 results:
                   $ref: '#/definitions/models.Movie'
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
+      summary: delete movie by id
+      tags:
+      - Movies
+    get:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk mendapatkan list movie dari id
+      parameters:
+      - description: movie id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.Movie'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
       summary: get list movie by id
       tags:
       - Movies
+  /orders:
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: untuk memesan tiket
+      parameters:
+      - description: ' '
+        in: formData
+        name: cinemaId
+        type: integer
+      - description: ' '
+        in: formData
+        name: movieId
+        type: integer
+      - description: ' '
+        in: formData
+        name: paymentId
+        type: integer
+      - collectionFormat: csv
+        description: ' '
+        in: formData
+        items:
+          type: string
+        name: seats[]
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controllers.Response'
+            - properties:
+                results:
+                  $ref: '#/definitions/models.TransactionResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
+      summary: place order
+      tags:
+      - Orders
   /profiles:
     get:
       consumes:
@@ -246,6 +417,10 @@ paths:
                 results:
                   $ref: '#/definitions/models.User'
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
       security:
       - ApiKeyAuth: []
       summary: get profile by id
@@ -256,6 +431,27 @@ paths:
       consumes:
       - application/x-www-form-urlencoded
       description: untuk mendapatkan list semua user
+      parameters:
+      - description: ' '
+        in: query
+        name: search
+        type: string
+      - description: ' '
+        in: query
+        name: sortBy
+        type: string
+      - description: ' '
+        in: query
+        name: sortOrder
+        type: string
+      - description: ' '
+        in: query
+        name: page
+        type: string
+      - description: ' '
+        in: query
+        name: limit
+        type: string
       produces:
       - application/json
       responses:
@@ -270,6 +466,12 @@ paths:
                     $ref: '#/definitions/models.User'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: get all list users
       tags:
       - Users
@@ -302,6 +504,12 @@ paths:
                     $ref: '#/definitions/models.User'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: create user
       tags:
       - Users
@@ -312,7 +520,7 @@ paths:
       description: untuk menghapus user
       parameters:
       - description: user id
-        in: query
+        in: path
         name: id
         required: true
         type: integer
@@ -330,6 +538,12 @@ paths:
                     $ref: '#/definitions/models.User'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: delete user by id
       tags:
       - Users
@@ -355,6 +569,12 @@ paths:
                 results:
                   $ref: '#/definitions/models.User'
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: get users by id
       tags:
       - Users
@@ -364,7 +584,7 @@ paths:
       description: untuk merubah data user
       parameters:
       - description: user id
-        in: query
+        in: path
         name: id
         required: true
         type: integer
@@ -380,17 +600,17 @@ paths:
         type: string
       - description: ' '
         in: formData
-        name: first_name
+        name: firstName
         required: true
         type: string
       - description: ' '
         in: formData
-        name: last_name
+        name: lastName
         required: true
         type: string
       - description: ' '
         in: formData
-        name: phone_number
+        name: phoneNumber
         required: true
         type: string
       - description: ' '
@@ -412,6 +632,12 @@ paths:
                     $ref: '#/definitions/models.User'
                   type: array
               type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/controllers.Response401'
+      security:
+      - ApiKeyAuth: []
       summary: update user
       tags:
       - Users
