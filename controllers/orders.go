@@ -37,11 +37,11 @@ func PlaceOrder(ctx *gin.Context) {
 	
 	var arrayseat []string
 	for _, v := range order.Seats {
-		splitSeats := strings.Split(v, ",") // Split semua kursi
-		arrayseat = append(arrayseat, splitSeats...) // Gabungkan hasil split
+		splitSeats := strings.Split(v, ",")
+		arrayseat = append(arrayseat, splitSeats...)
 	}
-	order.Seats = arrayseat // Update order.Seats dengan array yang sudah dipecah
-	fmt.Println("Processed seats: ", order.Seats)
+	order.Seats = arrayseat 
+	fmt.Println(order.Seats)
 	
     totalPrice := len(order.Seats)*50000
     expiryDate := time.Now().Add(3 * 24 * time.Hour)
