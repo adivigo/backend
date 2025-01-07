@@ -33,7 +33,7 @@ type TransactionResponse struct {
 
 }
 
-func AddOrder(order TransactionBody, userId, virtual, totalPrice int, expiryDate time.Time, status string) TransactionResponse {
+func AddOrder(order TransactionBody, userId, virtual, totalPrice int, expiryDate time.Time, status string) TransactionResponse{
 	conn, _ := lib.DB()
 	defer conn.Close(context.Background())
 

@@ -443,27 +443,16 @@ const docTemplate = `{
                         "description": " ",
                         "name": "seats[]",
                         "in": "formData"
+                    },
+                    {
+                        "type": "array",
+                        "description": "Daftar kursi yang dipilih",
+                        "name": "seats[]",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/controllers.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "results": {
-                                            "$ref": "#/definitions/models.TransactionResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
@@ -977,23 +966,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.TransactionResponse": {
-            "type": "object",
-            "properties": {
-                "expiryDate": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "totalPrice": {
-                    "type": "integer"
-                },
-                "virtualId": {
                     "type": "string"
                 }
             }

@@ -77,17 +77,6 @@ definitions:
     - banner
     - image
     type: object
-  models.TransactionResponse:
-    properties:
-      expiryDate:
-        type: string
-      status:
-        type: string
-      totalPrice:
-        type: integer
-      virtualId:
-        type: string
-    type: object
   models.User:
     properties:
       createdAt:
@@ -379,18 +368,14 @@ paths:
           type: string
         name: seats[]
         type: array
+      - description: Daftar kursi yang dipilih
+        in: formData
+        name: seats[]
+        required: true
+        type: array
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/controllers.Response'
-            - properties:
-                results:
-                  $ref: '#/definitions/models.TransactionResponse'
-              type: object
         "401":
           description: Unauthorized
           schema:

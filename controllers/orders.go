@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"latihan_gin/models"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,15 @@ func PlaceOrder(ctx *gin.Context) {
 
     virtualId :=int(time.Now().UnixNano()/(1<<22))
     virtual := int(virtualId)
+	
+	var arrayseat []string
+	for _, v := range order.Seats {
+		splitSeats := strings.Split(v, ",") // Split semua kursi
+		arrayseat = append(arrayseat, splitSeats...) // Gabungkan hasil split
+	}
+	order.Seats = arrayseat // Update order.Seats dengan array yang sudah dipecah
+	fmt.Println("Processed seats: ", order.Seats)
+	
     totalPrice := len(order.Seats)*50000
     expiryDate := time.Now().Add(3 * 24 * time.Hour)
     status := "pending"
