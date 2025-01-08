@@ -56,10 +56,10 @@ func GetAllUsers(c *gin.Context) {
 		Message: "List of users",
 		PageInfo: PageInfo{
 			CurrentPage: page,
-			NextPage: nextPage,
-			PrevPage: prevPage,
-			TotalPage: totalPage,
-			TotalData: total,
+			NextPage:    nextPage,
+			PrevPage:    prevPage,
+			TotalPage:   totalPage,
+			TotalData:   total,
 		},
 		Results: showUser,
 	})
@@ -78,7 +78,7 @@ func GetAllUsers(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Router /users/{id} [get]
 func GetUserById(ctx *gin.Context) {
-	paramId, err := strconv.Atoi(ctx.Param("id")) 
+	paramId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(400, Response{
 			Success: false,
@@ -116,10 +116,10 @@ func GetUserById(ctx *gin.Context) {
 // @Failure 401 {object} Response401
 // @Security ApiKeyAuth
 // @Router /users/{id} [DELETE]
-func DeleteUser(c *gin.Context){
-	paramId, _ := strconv.Atoi(c.Param("id")) 
+func DeleteUser(c *gin.Context) {
+	paramId, _ := strconv.Atoi(c.Param("id"))
 	user := models.FindOneUser(paramId)
-    if user == (models.User{}) {
+	if user == (models.User{}) {
 		c.JSON(http.StatusNotFound, Response{
 			Success: false,
 			Message: "user not found",
@@ -155,7 +155,7 @@ func DeleteUser(c *gin.Context){
 // @Security ApiKeyAuth
 // @Router /users/{id} [PATCH]
 func EditUser(c *gin.Context) {
-	paramId, _ := strconv.Atoi(c.Param("id")) 
+	paramId, _ := strconv.Atoi(c.Param("id"))
 	user := models.FindOneUser(paramId)
 
 	if user == (models.User{}) {
@@ -170,7 +170,7 @@ func EditUser(c *gin.Context) {
 
 	f, _ := c.MultipartForm()
 	file, _ := c.FormFile("image")
-	
+
 	user.PhoneNumber = f.Value["phone_number"][0]
 
 	if file.Filename != "" {
@@ -183,7 +183,7 @@ func EditUser(c *gin.Context) {
 		}
 		filename := uuid.New().String()
 		splittedFilename := strings.Split(file.Filename, ".")
-		ext := splittedFilename[len(splittedFilename) - 1]
+		ext := splittedFilename[len(splittedFilename)-1]
 		if ext != "jpg" && ext != "png" {
 			c.JSON(http.StatusBadRequest, Response{
 				Success: false,
@@ -192,10 +192,10 @@ func EditUser(c *gin.Context) {
 			return
 		}
 		storedFile := fmt.Sprintf("%s.%s", filename, ext)
-		c.SaveUploadedFile(file, fmt.Sprintf("uploads/movie/%s", storedFile))
+		c.SaveUploadedFile(file, fmt.Sprintf("uploads/images/%s", storedFile))
 		user.Image = &storedFile
 	}
-	
+
 	if !strings.Contains(user.Password, "$argon2i$v=19$m=65536,t=1,p=2$") {
 		if user.Password != "" {
 			user.Password, _ = argon2.CreateHash(user.Password, "", argon2.DefaultParams)
@@ -203,7 +203,7 @@ func EditUser(c *gin.Context) {
 	}
 
 	updated := models.UpdateUser(user)
-		fmt.Println(updated)
+	fmt.Println(updated)
 
 	c.JSON(200, Response{
 		Success: true,
@@ -227,7 +227,7 @@ func EditUser(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	var user models.User
 	c.ShouldBind(&user)
-	
+
 	if user.Password != "" {
 		user.Password, _ = argon2.CreateHash(user.Password, "", argon2.DefaultParams)
 	}

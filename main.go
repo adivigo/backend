@@ -17,7 +17,7 @@ import (
 // @name Authorization
 
 func main() {
-	route := gin.New(func (e *gin.Engine)  {
+	route := gin.New(func(e *gin.Engine) {
 		e.RedirectTrailingSlash = false
 	})
 
@@ -25,5 +25,5 @@ func main() {
 
 	routers.Routers(route)
 
-	route.Run("localhost:8888")
+	route.Run(":8888")
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"latihan_gin/lib"
 	"latihan_gin/models"
+	"log"
 	"math"
 	"net/http"
 	"strconv"
@@ -18,22 +19,22 @@ import (
 
 type PageInfo struct {
 	CurrentPage int `json:"currentPage,omitempty"`
-	NextPage int `json:"nextPage,omitempty"`
-	PrevPage int `json:"prevPage,omitempty"`
-	TotalPage int `json:"totalPage,omitempty"`
-	TotalData int `json:"totalData,omitempty"`
+	NextPage    int `json:"nextPage,omitempty"`
+	PrevPage    int `json:"prevPage,omitempty"`
+	TotalPage   int `json:"totalPage,omitempty"`
+	TotalData   int `json:"totalData,omitempty"`
 }
 
 type Response struct {
-	Success bool `json:"success"`
-	Message string `json:"message"`
-	PageInfo any `json:"pageInfo,omitempty"`
-	Results any `json:"results,omitempty"`
+	Success  bool   `json:"success"`
+	Message  string `json:"message"`
+	PageInfo any    `json:"pageInfo,omitempty"`
+	Results  any    `json:"results,omitempty"`
 }
 
 type Response401 struct {
-    Success bool `json:"success" default:"False"`
-    Message string `json:"message" default:"Unauthorized"`
+	Success bool   `json:"success" default:"False"`
+	Message string `json:"message" default:"Unauthorized"`
 }
 
 var MaxFileSize int64 = 2 << 20
@@ -53,7 +54,7 @@ var MaxFileSize int64 = 2 << 20
 // @Success 200 {object} Response{results=models.ListMovies}
 // @Failure 401 {object} Response401
 // @Router /movies [get]
-func GetAllMovies(c *gin.Context){
+func GetAllMovies(c *gin.Context) {
 	search := c.Query("search")
 	sortBy := c.DefaultQuery("sort_by", "id")
 	sortOrder := c.DefaultQuery("sort_order", "asc")
@@ -65,7 +66,7 @@ func GetAllMovies(c *gin.Context){
 
 	get := lib.Redis().Get(context.Background(), c.Request.RequestURI)
 	getCount := lib.Redis().Get(context.Background(), fmt.Sprintf("count+%s", c.Request.RequestURI))
-	if get.Val() != ""{
+	if get.Val() != "" {
 		rawData := []byte(get.Val())
 		json.Unmarshal(rawData, &showMovie)
 	} else {
@@ -73,7 +74,7 @@ func GetAllMovies(c *gin.Context){
 		encoded, _ := json.Marshal(showMovie)
 		lib.Redis().Set(context.Background(), c.Request.RequestURI, string(encoded), 0) // <- 60s
 	}
-	
+
 	if getCount.Val() != "" {
 		rawData := []byte(getCount.Val())
 		json.Unmarshal(rawData, &count)
@@ -82,7 +83,6 @@ func GetAllMovies(c *gin.Context){
 		encoded, _ := json.Marshal(count)
 		lib.Redis().Set(context.Background(), fmt.Sprintf("count+%s", c.Request.RequestURI), string(encoded), 0)
 	}
-
 
 	totalPage := int(math.Ceil(float64(count) / float64(pageLimit)))
 
@@ -101,10 +101,10 @@ func GetAllMovies(c *gin.Context){
 		Message: "List of movies",
 		PageInfo: PageInfo{
 			CurrentPage: page,
-			NextPage: nextPage,
-			PrevPage: prevPage,
-			TotalPage: totalPage,
-			TotalData: count,
+			NextPage:    nextPage,
+			PrevPage:    prevPage,
+			TotalPage:   totalPage,
+			TotalData:   count,
 		},
 		Results: showMovie,
 	})
@@ -122,7 +122,7 @@ func GetAllMovies(c *gin.Context){
 // @Failure 401 {object} Response401
 // @Router /movies/{id} [get]
 func GetMovieById(ctx *gin.Context) {
-	paramId, err := strconv.Atoi(ctx.Param("id")) 
+	paramId, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(400, Response{
 			Success: false,
@@ -229,13 +229,14 @@ func handleFileUpload(c *gin.Context, fieldName string) (string, error) {
 
 	splittedFilename := strings.Split(file.Filename, ".")
 	ext := splittedFilename[len(splittedFilename)-1]
-	if ext != "jpg" && ext != "png" {
-		return "", fmt.Errorf("format file bukan png atau jpg")
+	log.Println(ext)
+	if ext != "jpg" && ext != "png" && ext != "jpeg" {
+		return "", fmt.Errorf("format file bukan png/jpg/jpeg")
 	}
 
 	filename := uuid.New().String()
 	storedFile := fmt.Sprintf("%s.%s", filename, ext)
-	if err := c.SaveUploadedFile(file, fmt.Sprintf("uploads/movie/%s", storedFile)); err != nil {
+	if err := c.SaveUploadedFile(file, fmt.Sprintf("uploads/images/%s", storedFile)); err != nil {
 		return "", fmt.Errorf("failed to save file: %v", err)
 	}
 
@@ -255,16 +256,16 @@ func handleFileUpload(c *gin.Context, fieldName string) (string, error) {
 // @Security ApiKeyAuth
 // @Router /movies/{id} [DELETE]
 func DeleteMovie(c *gin.Context) {
-	paramId, _ := strconv.Atoi(c.Param("id")) 
+	paramId, _ := strconv.Atoi(c.Param("id"))
 	movie := models.FindOneMovie(paramId)
-    if movie == (models.MovieData{}) {
+	if movie == (models.MovieData{}) {
 		c.JSON(http.StatusNotFound, Response{
 			Success: false,
 			Message: "movie not found",
 		})
 		return
 	}
-	
+
 	deleted := models.RemoveMovie(paramId)
 
 	c.JSON(http.StatusNotFound, Response{
@@ -275,7 +276,7 @@ func DeleteMovie(c *gin.Context) {
 }
 
 // func UpdateMovie(c *gin.Context) {
-// 	paramId, _ := strconv.Atoi(c.Param("id")) 
+// 	paramId, _ := strconv.Atoi(c.Param("id"))
 // 	movie := models.FindOneMovie(paramId)
 
 // 	if movie == (models.Movie{}) {
