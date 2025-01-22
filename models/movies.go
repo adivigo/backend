@@ -44,7 +44,10 @@ type MovieData struct {
 type ListMovies []MovieData
 
 func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) ListMovies {
-	conn, _ := lib.DB()
+	conn, erro := lib.DB()
+	if erro != nil {
+		fmt.Println(erro)
+	}
 	defer conn.Close(context.Background())
 
 	var rows pgx.Rows
@@ -77,6 +80,10 @@ func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) ListMo
 			ORDER BY ` + sortBy + ` ` + sortOrder + `
 			LIMIT $1 OFFSET $2
 		`, pageLimit, offset)
+		// rows, err = conn.Query(context.Background(), `
+		// SELECT title from movies
+		// `)
+		// log.Println(err.Error())
 	}
 
 	if err != nil {
@@ -167,24 +174,30 @@ func InsertMovie(movie MovieBody, releaseDate time.Time) MovieData {
 	return newlyCreated
 }
 
-// func UpdateMovie(movie Movie) Movie {
-// 	conn := lib.DB()
-// 	defer conn.Close(context.Background())
+func UpdateMovie(movie MovieData) MovieData {
+	conn, _ := lib.DB()
+	defer conn.Close(context.Background())
 	
-// 	var updatedMovie Movie
+	var updatedMovie MovieData
 
-// 	conn.QueryRow(context.Background(), `
-// 		UPDATE movies SET title=$1, description=$2 WHERE id = $3
-// 		RETURNING id, title, description, created_at, updated_at
-// 	`, movie.Title, movie.Description, movie.Id).Scan(
-// 		&updatedMovie.Id, 
-// 		&updatedMovie.Title, 
-// 		&updatedMovie.Description, 
-// 		&updatedMovie.CreatedAt, 
-// 		&updatedMovie.UpdatedAt,
-// 	)
-// 	return updatedMovie
-// }
+	err := conn.QueryRow(context.Background(), `
+		UPDATE movies SET title=$1, image=$2, banner=$3, tag=$4, release_date=$5, duration=$6, synopsis=$7 WHERE id = $8
+		RETURNING id, title, image, banner, tag, release_date, duration, synopsis, created_at, updated_at
+	`, movie.Title, movie.Image, movie.Banner, movie.Tag, movie.ReleaseDate, movie.Duration, movie.Synopsis, movie.Id).Scan(
+		&updatedMovie.Id, 
+		&updatedMovie.Title, 
+		&updatedMovie.Image, 
+		&updatedMovie.Banner, 
+		&updatedMovie.Tag, 
+		&updatedMovie.ReleaseDate, 
+		&updatedMovie.Duration, 
+		&updatedMovie.Synopsis, 
+		&updatedMovie.CreatedAt, 
+		&updatedMovie.UpdatedAt,
+	)
+	fmt.Println(err)
+	return updatedMovie
+}
 
 func RemoveMovie(id int) (MovieData) {
 	conn, _ := lib.DB()

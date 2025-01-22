@@ -275,26 +275,46 @@ func DeleteMovie(c *gin.Context) {
 	})
 }
 
-// func UpdateMovie(c *gin.Context) {
-// 	paramId, _ := strconv.Atoi(c.Param("id"))
-// 	movie := models.FindOneMovie(paramId)
+func UpdateMovie(c *gin.Context) {
+	paramId, _ := strconv.Atoi(c.Param("id"))
+	movie := models.FindOneMovie(paramId)
 
-// 	if movie == (models.Movie{}) {
-// 		c.JSON(404, Response{
-// 			Success: false,
-// 			Message: "movie not Found",
-// 		})
-// 		return
-// 	}
+	if movie == (models.MovieData{}) {
+		c.JSON(404, Response{
+			Success: false,
+			Message: "movie not Found",
+		})
+		return
+	}
 
-// 	c.ShouldBind(&movie)
+	c.ShouldBind(&movie)
 
-// 	updated := models.UpdateMovie(movie)
-// 		fmt.Println(updated)
+	savedImage, err := handleFileUpload(c, "image")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, Response{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+	movie.Image = savedImage
 
-// 	c.JSON(200, Response{
-// 		Success: true,
-// 		Message: "Detail movie",
-// 		Results: updated,
-// 	})
-// }
+	savedBanner, err := handleFileUpload(c, "banner")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, Response{
+			Success: false,
+			Message: err.Error(),
+		})
+		return
+	}
+	movie.Banner = savedBanner
+
+	updated := models.UpdateMovie(movie)
+		// fmt.Println(updated)
+
+	c.JSON(200, Response{
+		Success: true,
+		Message: "Detail movie",
+		Results: updated,
+	})
+}

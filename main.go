@@ -3,6 +3,7 @@ package main
 import (
 	"latihan_gin/routers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +24,14 @@ func main() {
 
 	route.MaxMultipartMemory = 2 << 20
 
+	route.Static("/profiles/images", "uploads/images")
+	route.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowHeaders: []string{"Authorization", "Content-Type"},
+		AllowMethods: []string{"GET", "POST", "PATCH", "DELETE"},
+	}))
+
 	routers.Routers(route)
 
-	route.Run(":8888")
+	route.Run("localhost:8888")
 }

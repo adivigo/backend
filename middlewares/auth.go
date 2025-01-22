@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"latihan_gin/controllers"
 	"net/http"
 	"os"
@@ -34,8 +33,7 @@ func ValidateToken() gin.HandlerFunc{
 		var JWT_SECRET []byte = []byte(controllers.GetMd5Hash(os.Getenv("JWT_SECRET")))
 			
 		erro := tok.Claims(JWT_SECRET, &out)
-		
-		fmt.Println(out)
+
 		ctx.Set("userId", out["userId"].(float64))
 
 		if erro != nil {

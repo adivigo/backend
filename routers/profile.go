@@ -10,4 +10,5 @@ import (
 func ProfileRouter(router *gin.RouterGroup) {
 	router.Use(middlewares.ValidateToken())
 	router.GET("", controllers.GetProfileById)
+	router.PATCH("", controllers.EditProfile)
 }

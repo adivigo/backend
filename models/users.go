@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	Id         int       `json:"id"`
+	Id         int       `json:"id" gorm:"primaryKey"`
 	Email      string    `json:"email" form:"email"`
 	Password   string    `json:"password" form:"password"`
 	FirstName   *string    `json:"firstName" form:"first_name"`
