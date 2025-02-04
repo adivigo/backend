@@ -318,3 +318,54 @@ func UpdateMovie(c *gin.Context) {
 		Results: updated,
 	})
 }
+
+func GetAllCinemas(c *gin.Context) {
+
+	var showCinema []models.Cinemas
+	showCinema = models.FindAllCinemas()
+
+	c.JSON(200, Response{
+		Success: true,
+		Message: "List of cinema",
+		Results: showCinema,
+	})
+}
+
+func GetAllSeats(c *gin.Context) {
+
+	var showSeats []models.Seats
+	showSeats = models.FindAllSeats()
+
+	c.JSON(200, Response{
+		Success: true,
+		Message: "List of seats",
+		Results: showSeats,
+	})
+}
+
+func GetCinemaById(ctx *gin.Context) {
+	paramId, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(400, Response{
+			Success: false,
+			Message: "Wrong id format",
+		})
+		return
+	}
+
+	oneCinema := models.FindOneCinema(paramId)
+
+	if oneCinema == (models.Cinemas{}) {
+		ctx.JSON(404, Response{
+			Success: false,
+			Message: "Cinema not Found",
+		})
+		return
+	}
+
+	ctx.JSON(200, Response{
+		Success: true,
+		Message: "Detail cinema",
+		Results: oneCinema,
+	})
+}

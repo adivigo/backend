@@ -10,4 +10,5 @@ import (
 func OrderRouter(router *gin.RouterGroup) {
 	router.Use(middlewares.ValidateToken())
 	router.POST("", controllers.PlaceOrder)
+	router.GET("/payment", controllers.GetAllPayment)
 }

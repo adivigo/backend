@@ -16,4 +16,6 @@ func Routers(router *gin.Engine) {
 	UserRouter(router.Group("/users"))
 	ProfileRouter(router.Group("/profiles"))
 	OrderRouter(router.Group("/orders"))
+	CinemaRouter(router.Group("/cinemas"))
+	SeatRouter(router.Group("/seats"))
 }

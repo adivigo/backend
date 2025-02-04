@@ -41,7 +41,89 @@ type MovieData struct {
 	UpdatedAt *time.Time `json:"updatedAt" db:"updated_at"`
 }
 
+type Cinemas struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Image string `json:"image"`
+	Date time.Time `json:"date"`
+	Time time.Time `json:"time"`
+	ListCity string `json:"listCity"`
+}
+
+type Seats struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+}
+
 type ListMovies []MovieData
+
+
+func FindAllSeats() []Seats {
+	conn, erro := lib.DB()
+	if erro != nil {
+		fmt.Println(erro)
+	}
+	defer conn.Close(context.Background())
+
+	var rows pgx.Rows
+	var err error
+
+	rows, _ = conn.Query(context.Background(), `
+			select seats.id, seats.name from seats
+		`)
+
+	seats, err := pgx.CollectRows(rows, pgx.RowToStructByName[Seats])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return seats
+}
+
+func FindAllCinemas() []Cinemas {
+	conn, erro := lib.DB()
+	if erro != nil {
+		fmt.Println(erro)
+	}
+	defer conn.Close(context.Background())
+
+	var rows pgx.Rows
+	var err error
+
+	rows, _ = conn.Query(context.Background(), `
+			select cinemas.id, cinemas.name, cinemas.image, cinemas.date, cinemas.time, cinemas.list_city from cinemas
+		`)
+
+	cinemas, err := pgx.CollectRows(rows, pgx.RowToStructByName[Cinemas])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return cinemas
+}
+
+func FindOneCinema(paramId int) Cinemas {
+	var cinema Cinemas
+
+	conn, _ := lib.DB()
+	defer conn.Close(context.Background())
+
+	err := conn.QueryRow(context.Background(), `
+		select cinemas.id, cinemas.name, cinemas.image, cinemas.date, cinemas.time, cinemas.list_city from cinemas
+		WHERE cinemas.id = $1
+	`, paramId).Scan(
+		&cinema.Id,
+		&cinema.Name,
+		&cinema.Image,
+		&cinema.Date,
+		&cinema.Time,
+		&cinema.ListCity,
+	)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return cinema
+}
 
 func FindAllMovies(search, sortBy, sortOrder string, page, pageLimit int) ListMovies {
 	conn, erro := lib.DB()

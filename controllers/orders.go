@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"latihan_gin/models"
+	"net/http/httputil"
 	"strings"
 	"time"
 
@@ -26,10 +27,21 @@ import (
 // @Router /orders [post]
 func PlaceOrder(ctx *gin.Context) {
     var order models.TransactionBody
-	ctx.ShouldBind(&order)
+	err := ctx.ShouldBind(&order)
+	if err != nil {
+		fmt.Println(err.Error())
+		ctx.JSON(400, Response{
+			Success: false,
+			Message: "order gagal",
+		})
+		return
+	}
+	dump,_:=httputil.DumpRequest(ctx.Request,true)
+	fmt.Printf("dump: %q\n", dump)
+	fmt.Println("ini order",order)
 
 	val, isAvailable := ctx.Get("userId")
-    fmt.Println(val)
+    fmt.Println("user id:",val)
 	userId := int(val.(float64))
 
     virtualId :=int(time.Now().UnixNano()/(1<<22))
@@ -56,4 +68,16 @@ func PlaceOrder(ctx *gin.Context) {
             Results: orders,
 		})
 	}
+}
+
+func GetAllPayment(c *gin.Context) {
+
+	var showPayment []models.PaymentResponse
+	showPayment = models.FindAllPayment()
+
+	c.JSON(200, Response{
+		Success: true,
+		Message: "List of payment",
+		Results: showPayment,
+	})
 }
