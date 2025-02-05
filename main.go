@@ -2,6 +2,7 @@ package main
 
 import (
 	"latihan_gin/routers"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -33,5 +34,9 @@ func main() {
 
 	routers.Routers(route)
 
+	route.GET("/api/hello", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"message": "Hello from Golang Backend!"})
+	})
+	
 	route.Run("localhost:8888")
 }
